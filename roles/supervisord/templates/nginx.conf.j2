@@ -1,0 +1,10 @@
+[program:nginx]
+command = {{ nginx.dir }}/sbin/nginx -c {{ nginx.dir }}/conf/nginx.conf
+user = webapp
+process_name= %(program_name)s
+autorestart = true
+stdout_logfile = {{ nginx.logdir }}/nginx.log
+stdout_logfile_maxbytes = 10MB
+stdout_logfile_backups = 5
+stdout_capture_maxbytes = 1MB
+redirect_stderr = true

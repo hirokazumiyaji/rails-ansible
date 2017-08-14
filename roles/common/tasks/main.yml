@@ -1,0 +1,58 @@
+---
+
+- name: create webapp group
+  group:
+    name: webapp
+    state: present
+
+- name: create webapp user
+  user:
+    name: webapp
+    comment: "application common user"
+    group: webapp
+    state: present
+
+- name: yum update
+  yum:
+    update-cache: yes
+
+- name: yum upgrade
+  yum:
+    name: "*"
+    state: latest
+
+- name: change timezone
+  file:
+    src: /usr/share/zoneinfo/Asia/Tokyo
+    dest: /etc/localtime
+    state: link
+    force: true
+
+- name: webapp sudoers
+  lineinfile:
+    dest: /etc/sudoers.d/webapp
+    line: "webapp ALL=(ALL) NOPASSWD: ALL"
+    owner: root
+    group: root
+    mode: 0440
+    state: present
+    create: yes
+    validate: "visudo -cf %s"
+
+- name: install pkg
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+      - gcc
+      - g++
+      - make
+      - git
+
+- name: webapp bash profile
+  template:
+    src: bash_profile.j2
+    dest: /home/webapp/.bash_profile
+    owner: webapp
+    group: webapp
+    mode: 0600

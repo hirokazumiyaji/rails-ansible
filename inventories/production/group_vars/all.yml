@@ -1,0 +1,7 @@
+application:
+  environment: production
+  server_name: localhost
+  dir: /home/webapp/app
+  log_dir: /var/log/app
+nginx:
+  dir: /usr/local/nginx

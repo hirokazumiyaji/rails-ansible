@@ -1,0 +1,9 @@
+---
+
+- name: create app log dir
+  file:
+    path: "{{ application.logdir }}"
+    state: directory
+    owner: webapp
+    group: webapp
+    mode: 0755

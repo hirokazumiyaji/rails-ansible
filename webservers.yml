@@ -1,0 +1,11 @@
+---
+
+- hosts: webservers
+  become: true
+  user: vagrant
+  roles:
+    - common
+    - ruby
+    - nginx
+    - app
+    - supervisord

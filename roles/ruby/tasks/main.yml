@@ -1,0 +1,55 @@
+---
+
+- name: install dependency package
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libssl-dev
+    - libreadline-dev
+    - zlib1g-dev
+
+- name: install rbenv
+  become_user: webapp
+  git:
+    repo: https://github.com/sstephenson/rbenv.git
+    dest: /home/webapp/.rbenv
+
+- name: install ruby build
+  become_user: webapp
+  git:
+    repo: https://github.com/sstephenson/ruby-build.git
+    dest: /home/webapp/.rbenv/plugins/ruby-build
+
+- name: check install ruby
+  become_user: webapp
+  command: bash -lc "rbenv versions | grep {{ ruby.version }}"
+  register: ruby_installed
+  changed_when: false
+  ignore_errors: yes
+
+- name: install ruby
+  become_user: webapp
+  command: bash -lc "rbenv install {{ ruby.version }}"
+  when: ruby_installed|failed
+
+- name: rbenv rehash
+  become_user: webapp
+  command: bash -lc "rbenv rehash {{ ruby.version }}"
+  when: ruby_installed|failed
+
+- name: check rbenv set version
+  become_user: webapp
+  command: bash -lc "rbenv version | grep {{ ruby.version }}"
+  register: rbenv_default_version
+  changed_when: false
+  ignore_errors: yes
+
+- name: rbenv global
+  become_user: webapp
+  command: bash -lc "rbenv global {{ ruby.version }}"
+  when: rbenv_default_version|failed
+
+- name: install bundler
+  become_user: webapp
+  command: bash -lc "gem install bundler"

@@ -1,0 +1,10 @@
+application:
+  environment: development
+  server_name: localhost
+  dir: /home/webapp/app
+  logdir: /var/log/app
+nginx:
+  workdir: /opt
+  version: 1.13.4
+  logdir: /var/log/nginx
+  dir: /usr/local/nginx

@@ -1,0 +1,40 @@
+---
+
+- name: download nginx build
+  get_url:
+    url: https://github.com/cubicdaiya/nginx-build/releases/download/v0.11.0/nginx-build-linux-amd64-0.11.0.tar.gz
+    dest: /tmp/nginx-build.tar.gz
+
+- name: unarchive nginx build
+  unarchive:
+    src: /tmp/nginx-build.tar.gz
+    dest: /usr/local/bin
+    remote_src: yes
+
+- name: check nginx install
+  stat:
+    path: "{{ nginx.dir }}"
+  register: check_nginx
+
+- name: build nginx
+  command: "nginx-build -d {{ nginx.workdir }} -v {{ nginx.version }} -zlib -pcre -openssl --with-http_stub_status_module --with-http_gzip_static_module --with-http_v2_module --with-http_ssl_module --with-pcre-jit"
+  when: check_nginx.isdir is undefined
+
+- name: install nginx
+  command: make install
+  args:
+    chdir: "{{ nginx.workdir }}/nginx/{{ nginx.version }}/nginx-{{ nginx.version }}"
+  when: check_nginx.isdir is undefined
+
+- name: nginx conf
+  template:
+    src: nginx.conf.j2
+    dest: /usr/local/nginx/conf/nginx.conf
+
+- name: create nginx log dir
+  file:
+    path: "{{ nginx.logdir }}"
+    state: directory
+    owner: webapp
+    group: webapp
+    mode: 0755

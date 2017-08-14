@@ -1,0 +1,12 @@
+[program:application]
+command = bundle exec puma -c config/{{ application.environment }}.rb
+user = webapp
+process_name= %(program_name)s
+directory = /home/webapp/application
+environment = RAILS_ENV={{ application.environment }}
+autorestart = true
+stdout_logfile = {{ application.logdir }}/app.log
+stdout_logfile_maxbytes = 10MB
+stdout_logfile_backups = 5
+stdout_capture_maxbytes = 10MB
+redirect_stderr = true
