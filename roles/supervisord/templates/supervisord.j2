@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+# chkconfig: 2345 80 20
+# description: Autostarts supervisord.
+
+. /etc/rc.d/init.d/functions
+
+supervisorctl="/usr/local/bin/supervisorctl"
+supervisord="/usr/local/bin/supervisord"
+name="supervisord"
+
+[ -f $supervisord ] || exit 1
+[ -f $supervisorctl ] || exit 1
+
+RETVAL=0
+
+start() {
+    echo -n "Starting $name: "
+    $supervisord -c /etc/supervisord.conf
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ]
+    then
+      echo -e "SUCCESS"
+    else
+      echo -e "FAILED"
+    fi
+    return $RETVAL
+}
+
+stop() {
+    echo -n "Stopping $name: "
+    $supervisorctl shutdown
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ]
+    then
+      echo -e "SUCCESS"
+    else
+      echo -e "FAILED"
+    fi
+    return $RETVAL
+}
+
+status() {
+  $supervisorctl status
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+
+    stop)
+        stop
+        ;;
+
+    restart)
+        stop
+        count=0
+        while [ $count -ne 30 ]
+        do
+            ret=`$supervisorctl status > /dev/null 2>&1 ; echo $?`
+            if [ $ret -eq 0 ]
+            then
+                echo -e ""
+                break
+            fi
+            echo -n "."
+            count=`expr $count + 1`
+            sleep 1s
+        done
+        start
+        ;;
+
+    status)
+        status
+        ;;
+esac
+
+exit $REVAL

@@ -1,22 +1,51 @@
 ---
 
+- name: pip upgrade
+  pip:
+    name: pip
+    state: latest
+    executable: pip-2.7
+
 - name: install supervisord
-  yum:
+  pip:
     name: supervisor
     state: present
+    executable: pip-2.7
 
-- name: application.conf
+- name: generate supervisord.conf
+  template:
+    src: supervisord.conf.j2
+    dest: /etc/supervisord/supervisord.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: generate supervisord init script
+  template:
+    src: supervisord.j2
+    dest: /etc/init.d/supervisord
+    owner: root
+    group: root
+    mode: 0700
+
+- name: generate application.conf
   template:
     src: application.conf.j2
-    dest: /etc/supervisor/conf.d/application.conf
+    dest: /etc/supervisord/conf.d/application.conf
     owner: root
     group: root
     mode: 0644
 
-- name: nginx.conf
+- name: generate nginx.conf
   template:
     src: nginx.conf.j2
-    dest: /etc/supervisor/conf.d/nginx.conf
+    dest: /etc/supervisord/conf.d/nginx.conf
     owner: root
     group: root
     mode: 0644
+
+- name: service supervisord
+  service:
+    name: supervisord
+    state: started
+    enabled: yes

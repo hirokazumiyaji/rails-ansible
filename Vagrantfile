@@ -10,6 +10,5 @@ Vagrant.configure("2") do |config|
     ansible.playbook = "webservers.yml"
     ansible.inventory_path = "inventories/development"
     ansible.limit = "all"
-    ansible.verbose = "vvvv"
   end
 end

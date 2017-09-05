@@ -14,10 +14,6 @@
 
 - name: yum update
   yum:
-    update-cache: yes
-
-- name: yum upgrade
-  yum:
     name: "*"
     state: latest
 
