@@ -1,0 +1,35 @@
+---
+
+- name: check nodejs
+  stat:
+    path: /usr/bin/node
+  register: check_nodejs
+
+- name: download nodejs
+  get_url:
+    url: "https://nodejs.org/dist/v{{ nodejs.version }}/node-v{{ nodejs.version }}-linux-x64.tar.xz"
+    dest: "/tmp/node-v{{ nodejs.version }}-linux-x64.tar.xz"
+  when: check_nodejs.stat.exists == False
+
+- name: unarchive nodejs
+  unarchive:
+    src: "/tmp/node-v{{ nodejs.version }}-linux-x64.tar.xz"
+    dest: /tmp
+    remote_src: yes
+  when: check_nodejs.stat.exists == False
+
+- name: move directory
+  command: "mv /tmp/node-v{{ nodejs.version }}-linux-x64 /usr/local/nodejs"
+  when: check_nodejs.stat.exists == False
+
+- name: link node
+  file:
+    src: /usr/local/nodejs/bin/node
+    dest: /usr/bin/node
+    state: link
+
+- name: link npm
+  file:
+    src: /usr/local/nodejs/bin/npm
+    dest: /usr/bin/npm
+    state: link

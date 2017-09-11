@@ -1,0 +1,27 @@
+---
+
+- name: check td-agent
+  stat:
+    path: /etc/init.d/td-agent
+  register: check_td_agent
+
+- name: download td-agent
+  get_url:
+    url: https://toolbelt.treasuredata.com/sh/install-redhat-td-agent2.sh
+    dest: /tmp
+  when: check_td_agent.stat.exists == False
+
+- name: install td-agent
+  command: bash "/tmp/install-redhat-td-agent2.sh"
+  when: check_td_agent.stat.exists == False
+
+- name: td-agent-gem install
+  command: "/usr/sbin/td-agent-gem install {{ item }}"
+  with_items:
+    - fluent-plugin-s3
+    - fluent-plugin-forest
+
+- name: generate td-agent conf
+  template:
+    src: td-agent.conf.j2
+    dest: /etc/td-agent/td-agent.conf

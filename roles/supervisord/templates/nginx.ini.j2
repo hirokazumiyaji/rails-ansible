@@ -1,6 +1,6 @@
 [program:nginx]
 command = {{ nginx.dir }}/sbin/nginx -c {{ nginx.dir }}/conf/nginx.conf
-user = webapp
+user = root
 process_name= %(program_name)s
 autorestart = true
 stdout_logfile = {{ nginx.logdir }}/nginx.log

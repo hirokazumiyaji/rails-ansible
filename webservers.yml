@@ -2,9 +2,12 @@
 
 - hosts: webservers
   become: true
-  user: vagrant
+  user: ec2-user
   roles:
     - common
+    - java
+    - nodejs
+    - td-agent
     - ruby
     - nginx
     - app

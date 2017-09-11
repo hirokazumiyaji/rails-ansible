@@ -12,18 +12,6 @@
     group: webapp
     state: present
 
-- name: yum update
-  yum:
-    name: "*"
-    state: latest
-
-- name: change timezone
-  file:
-    src: /usr/share/zoneinfo/Asia/Tokyo
-    dest: /etc/localtime
-    state: link
-    force: true
-
 - name: webapp sudoers
   lineinfile:
     dest: /etc/sudoers.d/webapp
@@ -35,20 +23,90 @@
     create: yes
     validate: "visudo -cf %s"
 
+- name: webapp bashrc
+  template:
+    src: bashrc.j2
+    dest: /home/webapp/.bashrc
+    owner: webapp
+    group: webapp
+    mode: 0600
+
+- name: webapp ssh directory
+  file:
+    path: /home/webapp/.ssh
+    state: directory
+    owner: webapp
+    group: webapp
+    mode: 0700
+- name: webapp authorized_keys
+  template:
+    src: authorized_keys.j2
+    dest: /home/webapp/.ssh/authorized_keys
+    owner: webapp
+    group: webapp
+    mode: 0600
+
+- name: change timezone
+  file:
+    src: /usr/share/zoneinfo/Asia/Tokyo
+    dest: /etc/localtime
+    state: link
+    force: true
+
+- name: yum update
+  yum:
+    name: "*"
+    state: latest
+
 - name: install pkg
   yum:
     name: "{{ item }}"
     state: present
   with_items:
       - gcc
-      - g++
+      - gcc-c++
       - make
       - git
 
-- name: webapp bash profile
-  template:
-    src: bash_profile.j2
-    dest: /home/webapp/.bash_profile
-    owner: webapp
-    group: webapp
-    mode: 0600
+- name: limits root soft nofile
+  pam_limits:
+    domain: root
+    limit_type: soft
+    limit_item: nofile
+    value: 65536
+
+- name: limits root hard nofile
+  pam_limits:
+    domain: root
+    limit_type: hard
+    limit_item: nofile
+    value: 65536
+
+- name: limits * soft nofile
+  pam_limits:
+    domain: "*"
+    limit_type: soft
+    limit_item: nofile
+    value: 65536
+
+- name: limits * hard nofile
+  pam_limits:
+    domain: "*"
+    limit_type: hard
+    limit_item: nofile
+    value: 65536
+
+- name: sysctl tcp_tw_recycle
+  sysctl:
+    name: net.ipv4.tcp_tw_recycle
+    value: 1
+
+- name: sysctl tcp_tw_reuse
+  sysctl:
+    name: net.ipv4.tcp_tw_reuse
+    value: 1
+
+- name: sysctl ip_local_port_range
+  sysctl:
+    name: net.ipv4.ip_local_port_range
+    value: "10240 65535"

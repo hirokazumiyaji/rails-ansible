@@ -5,9 +5,9 @@
     name: "{{ item }}"
     state: present
   with_items:
-    - libssl-dev
-    - libreadline-dev
-    - zlib1g-dev
+    - openssl-devel
+    - readline-devel
+    - zlib-devel
 
 - name: install rbenv
   become_user: webapp

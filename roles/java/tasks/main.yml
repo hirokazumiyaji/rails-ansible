@@ -1,0 +1,11 @@
+---
+
+- name: java install
+  yum:
+    name: "java-{{ java.version }}-openjdk"
+    state: present
+
+- name: link java
+  file:
+    src: /usr/bin/java8
+    dest: /usr/bin/java

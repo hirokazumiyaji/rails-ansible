@@ -1,0 +1,11 @@
+[td-agent]
+command = /usr/sbin/td-agent - c /etc/td-agent/td-agent.conf
+user = root
+process_name = %(program_name)s
+autostart = true
+autorestart = true
+stdout_logfile = /var/log/td-agent/td-agent.log
+stdout_logfile_maxbytes = 10MB
+stdout_logfile_backups = 5
+stdout_capture_maxbytes = 10MB
+redirect_stderr = true

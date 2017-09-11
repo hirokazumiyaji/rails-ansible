@@ -102,3 +102,5 @@ ENV/
 
 .vagrant
 /*.retry
+
+/roles/common/templates/authorized_keys.j2
